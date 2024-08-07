@@ -1,0 +1,73 @@
+FROM quay.io/mancubus77/bootc:base
+
+LABEL org.opencontainers.image.title="Rocket Chat bootc image"
+LABEL org.opencontainers.image.description="Demo of Rocketchat packed in bootc container"
+LABEL org.opencontainers.image.author="cerberus @ redhat"
+
+ARG VER
+# ARG VER=6.7.7
+# ARG VER=latest
+
+# Inatall Dependencies
+RUN dnf install -y GraphicsMagick gcc-c++ make git make checkpolicy policycoreutils selinux-policy-devel \
+    && curl -sL https://rpm.nodesource.com/setup_14.x | bash - \
+    && dnf install nodejs -y
+
+# Download Rocket Chat release 
+RUN echo "Downloading ${VER}" \
+    && curl -L https://releases.rocket.chat/${VER}/download -o /tmp/rocket.chat.tgz \
+    && tar -xzf /tmp/rocket.chat.tgz -C /tmp
+
+# Install NodeJS deps 
+RUN cd /tmp/bundle/programs/server \
+    && npm install --cache /tmp/
+
+# Move bundle to workfolder
+RUN mv /tmp/bundle /opt/Rocket.Chat
+
+# Create an app user 
+RUN useradd -M rocketchat \
+    && usermod -L rocketchat
+
+# Update app permissions
+RUN chown -R rocketchat:rocketchat /opt/Rocket.Chat
+
+# Add systemd service files
+COPY confgs/rocketchat.service /lib/systemd/system/rocketchat.service
+COPY confgs/rocketchat.service.env /lib/systemd/system/rocketchat.service.env
+
+# Customize Rocket Chat for 6.10
+# RUN mkdir -p /home/rocketchat/.cache \
+#     && cd /opt/Rocket.Chat/programs/server/npm/node_modules/@rocket.chat/apps-engine \
+#     && export DENO_DIR=/home/rocketchat/.cache/deno \
+#     && npm install --production \
+#     && npm run postinstall \
+#     && chown -R rocketchat:rocketchat /home/rocketchat
+
+# Install MongoDB
+RUN sudo dnf install -y mongodb-org \
+    && sed -i "s/^#  engine:/  engine: mmapv1/" /etc/mongod.conf \
+    && sed -i "s/^#replication:/replication:\n  replSetName: rs01/" /etc/mongod.conf
+
+# Install SELinux policies for Mongo
+RUN git clone https://github.com/mongodb/mongodb-selinux \
+    && cd mongodb-selinux \
+    && make \
+    && make install
+ 
+# Copy Systemd files for mongod and mount persistent storage
+COPY confgs/mongod.service /usr/lib/systemd/system/mongod.service
+COPY confgs/var-lib-mongo.mount /usr/lib/systemd/system/var-lib-mongo.mount
+COPY confgs/makefs-mongo.service /etc/systemd/system/
+COPY confgs/mongodir-chown.service /usr/lib/systemd/system/mongodir-chown.service
+
+# Enable Services
+RUN systemctl enable mongod \
+    && systemctl enable rocketchat \
+    && systemctl enable makefs-mongo.service \
+    && systemctl enable var-lib-mongo.mount \
+    && systemctl enable mongodir-chown.service \
+    && systemctl enable makefs-mongo.service
+
+# Know the port
+EXPOSE 3000

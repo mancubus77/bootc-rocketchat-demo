@@ -1,0 +1,13 @@
+[Unit]
+Description=Mongo mount
+After=network.target makefs-mongo.service
+Wants=makefs-mongo.service
+
+[Mount]
+What=/dev/vdb
+Where=/var/lib/mongo
+Type=xfs
+Options=defaults,context="system_u:object_r:mongod_var_lib_t:s0"
+
+[Install]
+WantedBy=multi-user.target

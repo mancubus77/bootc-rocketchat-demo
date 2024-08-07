@@ -1,0 +1,11 @@
+[Unit]
+Description=Ensure user mongod /var/lib/mongo
+After=var-lib-mongo.mount
+Requires=var-lib-mongo.mount
+
+[Service]
+Type=oneshot
+ExecStart=/bin/chown -R mongod:mongod /var/lib/mongo
+
+[Install]
+WantedBy=multi-user.target

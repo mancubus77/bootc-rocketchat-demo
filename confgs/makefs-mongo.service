@@ -1,0 +1,10 @@
+[Unit]
+Description=Create an xfs filesystem on a vdb device
+Before=var-lib-mongo.mount
+
+[Service]
+Type=oneshot
+ExecStart=/usr/lib/systemd/systemd-makefs xfs /dev/vdb
+
+[Install]
+WantedBy=multi-user.target

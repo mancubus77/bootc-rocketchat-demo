@@ -1,0 +1,12 @@
+FROM registry.redhat.io/rhel9/rhel-bootc:9.4
+LABEL org.opencontainers.image.title="RHEL 9.4 Base image"
+LABEL org.opencontainers.image.description="Demo of RHEL Base bootc container"
+LABEL org.opencontainers.image.author="cerberus @ redhat"
+
+# Enable Repos
+ADD repos/epel.repo /etc/yum.repos.d/epel.repo
+ADD repos/mongo.repo /etc/yum.repos.d/mongo.repo
+
+# Install the base components
+RUN dnf update -y \
+    && dnf install -y NetworkManager-tui insights-client vim

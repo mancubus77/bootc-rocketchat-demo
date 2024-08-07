@@ -1,0 +1,16 @@
+{
+ "blueprint": {
+   "customizations": {
+     "user": [
+       {
+         "name": "user",
+         "password": "user",
+         "key": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCfyPimk0wOM0dSvPjnM51oSuxiCJZKFXYvVK5dslGfanL01QiB9BrSV7WBIMpfvuUjXqCCe7eMJo61YnyLgQmtXjosyeMoXnhyAho0uQSatZHBP5uuPeHGxdf7YKS7/o15BWwlGfQKtef60ybiVRWfXvTXUQCttQVOjR2nGmXz8AIU2E8DJ0lJLUdGJgSpt3EWaizlziW0HD26zo74icaXNmmEXrAR+a4bkV4z+PZI2QJ633tuQA1lOtg4WcTzjA7kFRx/9BgRI/3B2Ch23Cwb8s3ObbAYOBjJc0t8c++J7TO2/lbNfygxx4eHF0WNYhxWWRwJfmS1SQ10MTQ188pUOX8y4IuC/zUkBqjetIYGnDhdXoCWrcDKIem+4iXeCtdkoDFhDLck+hmxONpJX4Ffa9AfSb6/oI7eV17rlj5fF7NVFrBo67WqjV5xrk3CPKJnBrrztoT2QJXgdQWt59XhRV3HQR9INKMpxZ0+oYrHrr88BVVRQu7DEclCuiVugTc= cerberus@dl380-02",
+         "groups": [
+           "wheel"
+         ]
+       }
+     ]
+   }
+ }
+}
